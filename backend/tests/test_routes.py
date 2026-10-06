@@ -49,6 +49,23 @@ def test_metrics_endpoint_respects_date_filters():
     assert all(item["create_date"] == first_date for item in payload)
 
 
+def test_metrics_endpoint_returns_financial_movement_fields():
+    response = client.get("/api/metrics")
+
+    assert response.status_code == 200
+    payload = response.json()
+    expected_fields = {
+        "create_date",
+        "amount",
+        "operation_type",
+        "category",
+        "business_type",
+    }
+
+    assert payload
+    assert all(set(item) == expected_fields for item in payload)
+
+
 def test_b2b_endpoint_only_returns_b2b_records():
     response = client.get("/api/metrics/b2b")
 
