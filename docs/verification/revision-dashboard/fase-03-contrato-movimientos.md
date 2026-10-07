@@ -4,7 +4,7 @@ Fecha: 2026-10-06
 
 ## Prueba de contrato
 
-- Prueba: `test_metrics_endpoint_returns_financial_movement_fields` en [backend/tests/test_routes.py](backend/tests/test_routes.py).
+- Prueba: `test_metrics_endpoint_returns_financial_movement_fields` en [backend/tests/test_routes.py](../../../backend/tests/test_routes.py).
 - Comando: `docker compose run --rm backend pytest -q tests/test_routes.py::test_metrics_endpoint_returns_financial_movement_fields`.
 - Resultado: `1 passed, 1 warning in 0.43s`.
 - La prueba consulta `/api/metrics` mediante `TestClient` y comprueba que cada movimiento incluya exactamente los cinco campos `create_date`, `amount`, `operation_type`, `category` y `business_type`.
@@ -12,9 +12,9 @@ Fecha: 2026-10-06
 
 ## Reglas aplicadas
 
-- [`.agents/rules/financial-api-contract.md`](.agents/rules/financial-api-contract.md): comprobé los nombres de campos serializados que comparten backend y frontend.
-- [`.agents/rules/tests-and-naming.md`](.agents/rules/tests-and-naming.md): usé pytest, `TestClient` y el nombre `test_...` para comprobar el comportamiento de la ruta.
-- [`.agents/rules/api-integration-verification.md`](.agents/rules/api-integration-verification.md): limité la conclusión a la respuesta de la API probada en backend. Esta prueba no verifica la petición a través del proxy de Vite ni la conectividad frontend-backend entre contenedores.
+- [`.agents/rules/financial-api-contract.md`](../../../.agents/rules/financial-api-contract.md): comprobé los nombres de campos serializados que comparten backend y frontend.
+- [`.agents/rules/tests-and-naming.md`](../../../.agents/rules/tests-and-naming.md): usé pytest, `TestClient` y el nombre `test_...` para comprobar el comportamiento de la ruta.
+- [`.agents/rules/api-integration-verification.md`](../../../.agents/rules/api-integration-verification.md): limité la conclusión a la respuesta de la API probada en backend. Esta prueba no verifica la petición a través del proxy de Vite ni la conectividad frontend-backend entre contenedores.
 
 ## Alcance
 

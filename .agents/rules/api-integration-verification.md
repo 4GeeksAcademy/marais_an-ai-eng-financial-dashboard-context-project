@@ -7,7 +7,7 @@ Al cambiar la ruta de API, el proxy de Vite, la red de Docker Compose o al afirm
 ## Hechos del repositorio
 
 - El recorrido actual es `frontend/src/App.tsx` → proxy `/api` en `frontend/vite.config.ts` → `backend/app/routes.py` ([llamada](../../frontend/src/App.tsx#L13-L17), [proxy](../../frontend/vite.config.ts#L11-L14), [ruta](../../backend/app/routes.py#L248-L260)).
-- `VERIFICACION_FASE_1.md` registra un `502` y `ETIMEDOUT` al acceder desde el frontend. La causa raíz no quedó determinada ([fallo observado](../../VERIFICACION_FASE_1.md#L30-L38), [estado pendiente](../../VERIFICACION_FASE_1.md#L40-L51)).
+- `fase-01-producto-arranque-integracion.md` registra un `502` y `ETIMEDOUT` al acceder desde el frontend. La causa raíz no quedó determinada ([fallo observado](../../docs/verification/revision-dashboard/fase-01-producto-arranque-integracion.md#L30-L38), [estado pendiente](../../docs/verification/revision-dashboard/fase-01-producto-arranque-integracion.md#L40-L51)).
 
 ## Reglas
 
