@@ -25,3 +25,12 @@ export interface CategoryEntry {
 }
 /** Respuesta real de /api/metrics/categories/top: array, incluido []; puede contener menos elementos que limit. */
 export type TopCategoriesResponse = CategoryEntry[];
+/** Elemento de GET /api/metrics/summary; todos sus campos son obligatorios y no admiten null. */
+export interface SummaryEntry {
+  /** Periodo agregado: string sin patron OpenAPI; formatos observados YYYY-MM-DD, YYYY-Www o YYYY-MM segun group_by. */ period: string;
+  /** Ingresos del periodo para los filtros aplicados; number sin limites ni moneda documentados. */ income: number;
+  /** Egresos del periodo para los filtros aplicados; number sin limites ni moneda documentados. */ outcome: number;
+  /** Diferencia income - outcome del periodo; number sin limites documentados, puede ser negativo; no es el total de ingresos. */ net: number;
+}
+/** Respuesta real de /api/metrics/summary: array de periodos, incluido []; no envoltorio, total global ni null. */
+export type SummaryResponse = SummaryEntry[];

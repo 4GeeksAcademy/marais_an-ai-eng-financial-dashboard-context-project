@@ -1,4 +1,4 @@
-import type { BusinessType, OperationType } from "../src/lib/financial-types";
+import type { BusinessType, Category, OperationType } from "../src/lib/financial-types";
 
 /** Queries opcionales: omitir propiedades sin valor. OpenAPI admite null en fechas y business_type, pero estos tipos usan omision, nunca el texto "null". Formatos y limites numericos requieren validacion en ejecucion. */
 export interface DateRangeFilter {
@@ -16,4 +16,11 @@ export interface TopCategoriesParams extends DateRangeFilter {
   /** Operacion: "income" o "outcome"; default API "outcome". La comparativa de ingresos necesita "income" explicitamente. */ operation_type?: OperationType;
   /** Maximo de categorias: entero entre 1 y 20 inclusive; default API 5. No garantiza cinco resultados. */ limit?: number;
   /** Grupo: "B2B" o "B2C". API nullable, sin default explicito; omitir para incluir ambos, no enviar "null". */ business_type?: BusinessType;
+}
+/** Query de GET /api/metrics/summary; hereda start_date/end_date opcionales YYYY-MM-DD. Filtros nullable en OpenAPI se representan por omision, nunca el texto "null". */
+export interface SummaryParams extends DateRangeFilter {
+  /** Agrupacion: "day", "week" o "month"; default API "month". */ group_by?: "day" | "week" | "month";
+  /** Operacion: "income" o "outcome". API nullable, sin default explicito; omitir para incluir ambas. */ operation_type?: OperationType;
+  /** Categoria: "suppliers", "sales", "operational", "administrative" u "others". API nullable, sin default explicito; omitir para incluir todas. */ category?: Category;
+  /** Grupo: "B2B" o "B2C". API nullable, sin default explicito; omitir para incluir ambos. */ business_type?: BusinessType;
 }
