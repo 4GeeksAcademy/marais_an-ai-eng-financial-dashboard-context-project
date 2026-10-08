@@ -1,6 +1,6 @@
 # Estado actual
 
-Actualizado: 2026-10-07. Se separan los resultados históricos de integración de las verificaciones de la entrega de especificaciones; ninguna comprobación de tipos o del contrato OpenAPI demuestra que el recorrido frontend → Vite → backend esté resuelto.
+Actualizado: 2026-10-08. Se separan los resultados históricos de integración de las verificaciones de la entrega de especificaciones; ninguna comprobación de tipos o del contrato OpenAPI demuestra que el recorrido frontend → Vite → backend esté resuelto.
 
 ## Evidencia histórica del dashboard
 
@@ -14,12 +14,24 @@ Actualizado: 2026-10-07. Se separan los resultados históricos de integración d
 - **Comprobación manual del usuario:** ambos gráficos admiten navegación con Tab, muestran el foco y permiten recorrer valores con las flechas.
 - **Restauración comprobada:** la instancia temporal terminó con código 143 y se retiró. Se recreó únicamente `frontend` con `docker compose up -d --no-deps --no-build`, sin reconstruir imágenes ni eliminar volúmenes. La página original respondió HTTP 200, pero `GET http://localhost:5173/api/metrics` agotó el timeout de 25 segundos (`curl` HTTP 000). El proxy original sigue fallando; no se demostró la causa raíz.
 
-## Skills de agentes, 2026-10-07
+## Registro de skills
 
 - Instaladas para GitHub Copilot en este repositorio: `accessibility`, fuente `addyosmani/web-quality-skills`, en [`../.agents/skills/accessibility/`](../.agents/skills/accessibility/SKILL.md); y `vercel-react-best-practices`, fuente `vercel-labs/agent-skills`, en [`../.agents/skills/vercel-react-best-practices/`](../.agents/skills/vercel-react-best-practices/SKILL.md). El manifiesto es [`../skills-lock.json`](../skills-lock.json).
+
+| Skill | Fuente | Hallazgos aceptados | Hallazgos rechazados o cuestionados y motivo | Evidencia |
+| --- | --- | --- | --- | --- |
+| [accessibility](../.agents/skills/accessibility/SKILL.md) | `addyosmani/web-quality-skills` | Hallazgo 2: `CardTitle` corregido a `h2`, aceptado tras revisar sus dos usos actuales en los gráficos. | Hallazgo 2 inicialmente cuestionado por afectar a un componente compartido; después aceptado al comprobar ambos usos y la jerarquía del dashboard. No fue rechazado. | 2026-10-08: build y lint correctos en el contenedor frontend (código 0). El usuario comprobó ambos títulos como `h2` en el DOM, apariencia conservada y funcionamiento de ambos gráficos con mouse, Tab y flechas. Prueba realizada mediante el proxy temporal en `5174`; no se probó con lector de pantalla y el proxy original sigue pendiente. |
+| [vercel-react-best-practices](../.agents/skills/vercel-react-best-practices/SKILL.md) | `vercel-labs/agent-skills` | Ninguno registrado en esta corrección. | Ninguno registrado en esta corrección. | Skill instalada y consultada como apoyo a la revisión React; sin cambios ni verificación específica de rendimiento. |
+
 - **Incidencia de instalación:** los comandos originales usaron `--yes`, contra la instrucción de la profesora. En adelante no usar `-y`, `--yes`, `-g` ni `--global`.
 - Se detectaron cuatro enlaces locales rotos, todos complementarios: [`accessibility/SKILL.md`](../.agents/skills/accessibility/SKILL.md#L462) enlaza a la skill opcional ausente `../web-quality-audit/SKILL.md`; [`vercel-react-best-practices/AGENTS.md`](../.agents/skills/vercel-react-best-practices/AGENTS.md#L116), [línea 219](../.agents/skills/vercel-react-best-practices/AGENTS.md#L219) y [línea 892](../.agents/skills/vercel-react-best-practices/AGENTS.md#L892) enlazan reglas como si estuvieran junto a `AGENTS.md`, aunque están bajo [`rules/`](../.agents/skills/vercel-react-best-practices/rules/async-defer-await.md). No impiden seguir el contenido principal; el enlace a `web-quality-audit` no está disponible y los tres de Vercel no resuelven desde `AGENTS.md`. No se instaló otra skill ni se editaron las descargadas.
-- **Hallazgos de accesibilidad aún sin corregir:** el error de carga en [`App.tsx`](../frontend/src/App.tsx#L51) no se anuncia con `role="alert"` o región viva; el título de página en [`index.html`](../frontend/index.html#L7) es genérico; [`CardTitle`](../frontend/src/components/ui/card.tsx#L31) renderiza un `div`, no un encabezado semántico. La revisión de todos los usos y del nivel apropiado de `CardTitle` sigue pendiente.
+- **Hallazgo 2, revisión y aceptación, 2026-10-08:** al aplicar `accessibility`, se cuestionó convertir [`CardTitle`](../frontend/src/components/ui/card.tsx#L31) en un encabezado por su alcance compartido. Se revisaron su definición, exportación y todos sus usos: los únicos consumidores actuales son [Income vs. Outcome](../frontend/src/components/dashboard/income-outcome-chart.tsx#L69) y [Profit Margin %](../frontend/src/components/dashboard/profit-percent-chart.tsx#L70); los KPI no usan `CardTitle`. El dashboard declara un [h1 Financial Overview](../frontend/src/components/dashboard/dashboard-header.tsx#L15), por lo que ambos títulos corresponden a `h2` hermanos. Tras esta revisión, el usuario aceptó la corrección mínima. Un futuro uso bajo otro encabezado deberá revisar el nivel apropiado.
+- **Corrección aplicada:** únicamente `CardTitle` pasó de `div` a `h2` y de `React.ComponentProps<'div'>` a `React.ComponentProps<'h2'>`, conservando clases, `data-slot` y propagación de propiedades. El JSX sigue autocerrado (`<h2 ... />`); `children` se propaga mediante las propiedades.
+- **Verificación del agente, 2026-10-08:** `npm run build` y `npm run lint`, ejecutados en `/app` del contenedor frontend mediante `docker compose exec -T -w /app frontend`, terminaron con código 0 usando las dependencias existentes. Build avisó de un chunk mayor de 500 kB; lint no reportó problemas. Los intentos previos en el workspace fallaron por ausencia de `tsc` y `eslint`, antes de analizar el código. No se instalaron ni actualizaron dependencias.
+- **Entorno de la comprobación manual, 2026-10-08:** el proxy original en `5173` volvió a agotar 25 segundos (`HTTP 000`). Se verificó el gateway actual `172.18.0.1` y se levantó una nueva instancia temporal de Vite en `5174`, con proxy en memoria hacia ese gateway y sin cambiar archivos de configuración. Página y `/api/metrics` respondieron HTTP 200; se comprobaron 360 movimientos y los cinco campos esperados. Esta instancia queda activa al registrar la evidencia; no es la prueba del día anterior, que fue retirada.
+- **Evidencia manual del usuario, 2026-10-08:** confirmó en el DOM que ambos títulos están dentro de `h2`, que su apariencia se conserva y que ambos gráficos siguen funcionando con mouse, Tab y flechas. Con esta evidencia, el hallazgo 2 queda corregido y aceptado en el entorno temporal.
+- **Límites:** el agente no contó con herramientas de navegador; la evidencia de DOM, apariencia e interacción fue aportada por el usuario. No se confirmó manualmente el recuento de `h1` ni el árbol de accesibilidad, y no se ejecutó una auditoría Lighthouse/axe o una prueba con lector de pantalla. La comprobación no acredita conformidad WCAG completa ni resuelve el proxy original; su causa raíz sigue pendiente.
+- **Hallazgos 1 y 3 aún sin corregir:** el error de carga en [`App.tsx`](../frontend/src/App.tsx#L51) no se anuncia con `role="alert"` o región viva; el título de página en [`index.html`](../frontend/index.html#L7) es genérico. No se aplicaron otras correcciones ni se implementaron las especificaciones frontend.
 
 ## Entrega de especificaciones frontend
 
@@ -31,6 +43,6 @@ Actualizado: 2026-10-07. Se separan los resultados históricos de integración d
 
 ## Estado y pendientes
 
-- Las skills están instaladas, pero no se aplicaron correcciones de accesibilidad ni cambios a la aplicación.
+- La skill `accessibility` se aplicó a `CardTitle`: el hallazgo 2 está corregido y aceptado con la evidencia y límites del Registro de skills. Los hallazgos 1 y 3 siguen pendientes.
 - La conectividad frontend → proxy de Vite → backend sigue pendiente: el proxy temporal vía gateway funcionó, pero el proxy original agotó el timeout. No se ha demostrado la causa raíz ([regla de integración](../.agents/rules/api-integration-verification.md)).
 - No presentar los criterios propuestos de las especificaciones como funcionalidades implementadas o aceptadas. Consultar [verification.md](../frontend/specs/verification.md) y [components.md](../frontend/specs/components.md) para límites y decisiones pendientes.
