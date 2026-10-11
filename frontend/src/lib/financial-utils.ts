@@ -4,6 +4,36 @@ import {
   type MonthlyDataPoint,
 } from "./financial-types";
 
+const apiDateFormatter = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+  timeZone: "UTC",
+});
+
+function formatApiDate(value: string): string {
+  const [year, month, day] = value.split("-").map(Number);
+  return apiDateFormatter.format(new Date(Date.UTC(year, month - 1, day)));
+}
+
+export function formatMovementDateRange(
+  movements: FinancialMovement[],
+): string {
+  const firstMovement = movements[0];
+  if (!firstMovement) return "No data available";
+
+  let minimumDate = firstMovement.create_date.slice(0, 10);
+  let maximumDate = minimumDate;
+
+  for (const movement of movements) {
+    const movementDate = movement.create_date.slice(0, 10);
+    if (movementDate < minimumDate) minimumDate = movementDate;
+    if (movementDate > maximumDate) maximumDate = movementDate;
+  }
+
+  return `${formatApiDate(minimumDate)} – ${formatApiDate(maximumDate)}`;
+}
+
 function toYearMonthKey(value: Date): string {
   return `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, "0")}`;
 }
