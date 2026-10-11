@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   computeKPIs,
   computeMonthlyData,
+  formatMovementDateRange,
   formatCurrency,
   formatPercent,
 } from "./financial-utils";
@@ -100,6 +101,79 @@ describe("computeMonthlyData", () => {
       outcome: 0,
       profitPercent: 100,
     });
+  });
+
+  it("returns zero monthly profitPercent when there is no income", () => {
+    const movementsWithoutIncome: FinancialMovement[] = [
+      {
+        create_date: "2024-03-05",
+        amount: 350,
+        operation_type: "outcome",
+        category: "operational",
+        business_type: "B2B",
+      },
+    ];
+
+    expect(computeMonthlyData(movementsWithoutIncome)).toEqual([
+      {
+        month: "Mar 2024",
+        income: 0,
+        outcome: 350,
+        profitPercent: 0,
+      },
+    ]);
+  });
+});
+
+describe("formatMovementDateRange", () => {
+  it("formats the earliest and latest dates from unsorted movements", () => {
+    const unsortedMovements: FinancialMovement[] = [
+      {
+        create_date: "2026-10-15",
+        amount: 200,
+        operation_type: "income",
+        category: "sales",
+        business_type: "B2B",
+      },
+      {
+        create_date: "2026-09-20",
+        amount: 100,
+        operation_type: "outcome",
+        category: "operational",
+        business_type: "B2B",
+      },
+      {
+        create_date: "2026-09-15",
+        amount: 150,
+        operation_type: "income",
+        category: "sales",
+        business_type: "B2C",
+      },
+    ];
+
+    expect(formatMovementDateRange(unsortedMovements)).toBe(
+      "Sep 15, 2026 – Oct 15, 2026",
+    );
+  });
+
+  it("shows No data available for an empty successful result", () => {
+    expect(formatMovementDateRange([])).toBe("No data available");
+  });
+
+  it("preserves the calendar day received from the API", () => {
+    const singleDayMovement: FinancialMovement[] = [
+      {
+        create_date: "2026-09-15",
+        amount: 100,
+        operation_type: "income",
+        category: "sales",
+        business_type: "B2B",
+      },
+    ];
+
+    expect(formatMovementDateRange(singleDayMovement)).toBe(
+      "Sep 15, 2026 – Sep 15, 2026",
+    );
   });
 });
 
